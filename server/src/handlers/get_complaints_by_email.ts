@@ -1,9 +1,20 @@
+import { db } from '../db';
+import { complaintsTable } from '../db/schema';
 import { type GetComplaintsByEmailInput, type Complaint } from '../schema';
+import { eq, desc } from 'drizzle-orm';
 
 export async function getComplaintsByEmail(input: GetComplaintsByEmailInput): Promise<Complaint[]> {
-    // This is a placeholder declaration! Real code should be implemented here.
-    // The goal of this handler is fetching all complaints for a specific customer email.
-    // This allows customers to view the status of their submitted complaints.
-    // Should return complaints ordered by created_at descending (newest first).
-    return [];
+  try {
+    // Query complaints for the specific customer email, ordered by created_at descending
+    const results = await db.select()
+      .from(complaintsTable)
+      .where(eq(complaintsTable.customer_email, input.customer_email))
+      .orderBy(desc(complaintsTable.created_at))
+      .execute();
+
+    return results;
+  } catch (error) {
+    console.error('Failed to get complaints by email:', error);
+    throw error;
+  }
 }
